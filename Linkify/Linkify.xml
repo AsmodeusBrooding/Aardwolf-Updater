@@ -161,7 +161,7 @@ function Raw_Update(retval, page, status, headers, full_status, request_url)
             return
         end
 
-        utilprint("@x238Updating is complete, Have a @Rm@Yu@Gd@Cd@Bi@Ms@mh day!")
+        utilprint("@x238[@RLi@x202n@x208k@x214i@x220f@x228y@x238] Updating is complete, Have a @Rm@Yu@Gd@Cd@Bi@Ms@mh day!")
         reloadPlugin()
     elseif cached_raw_version < cached_plugin_version then
         utilprint("Your development is too quick!")
