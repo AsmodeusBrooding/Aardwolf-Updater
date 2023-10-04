@@ -11,7 +11,7 @@
    save_state="y"
    date_written="2023-09-25 00:00:00"
    requires="4.00"
-   version="1.5"
+   version="1.51"
    >
 </plugin>
 
@@ -122,8 +122,14 @@ function OnPluginInstall()
     end
 end
 
+function reloadPlugin()
+    local currentPluginID = GetPluginID()
+    utilprint("@x238Currently reloading script: Linkify @x238 please stand by", "script")
+    ReloadPlugin(currentPluginID)
+end
+
+
 function UpdateSelf()
-    local FileRepo = "https://raw.githubusercontent.com/AsmodeusBrooding/ProceduralMUSH-Updater/main/PluginManager/ProceduralMUSH_Updater.xml"
     local async_ok, async = pcall(require, "async")
     if async_ok then
         async.doAsyncRemoteRequest(FileRepo, Raw_Update, "HTTPS")
@@ -156,8 +162,8 @@ function Raw_Update(retval, page, status, headers, full_status, request_url)
             return
         end
 
-        Execute("DoAfterSpecial(1, \"ReloadPlugin('" .. GetPluginID() .. "')\", sendto.script)")
         utilprint("Updating is complete, Have a muddish day!")
+        reloadPlugin()
     elseif cached_raw_version < cached_plugin_version then
         utilprint("Your development is too quick!")
     end
