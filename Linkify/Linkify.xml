@@ -11,7 +11,7 @@
    save_state="y"
    date_written="2023-09-25 00:00:00"
    requires="4.00"
-   version="1.51"
+   version="1.52"
    >
 </plugin>
 
@@ -124,7 +124,6 @@ end
 
 function reloadPlugin()
     local currentPluginID = GetPluginID()
-    utilprint("@x238Currently reloading script: Linkify @x238 please stand by", "script")
     ReloadPlugin(currentPluginID)
 end
 
@@ -149,9 +148,9 @@ function Raw_Update(retval, page, status, headers, full_status, request_url)
     local cached_plugin_version = tonumber(PLUGIN_VERSION)
 
     if cached_raw_version == cached_plugin_version then
-        utilprint("@Y" .. PLUGIN_NAME .. "@x238 is up to date!")
+        utilprint("@x238[@RLi@x202n@x208k@x214i@x220f@x228y@x238] Already up to date!")
     elseif cached_raw_version > cached_plugin_version then
-        utilprint("Updating from version @R" .. PLUGIN_VERSION .. "@x238 to @G" .. raw_version .. "@x238 Please stand by.")
+        utilprint("@x238[@RLi@x202n@x208k@x214i@x220f@x228y@x238] Updating from version @R" .. PLUGIN_VERSION .. "@x238 to @G" .. raw_version .. "@x238 Please stand by.")
 
         local file, err = io.open(GetPluginInfo(GetPluginID(), 6), "w")
         if file then
@@ -162,7 +161,7 @@ function Raw_Update(retval, page, status, headers, full_status, request_url)
             return
         end
 
-        utilprint("Updating is complete, Have a muddish day!")
+        utilprint("@x238Updating is complete, Have a @Rm@Yu@Gd@Cd@Bi@Ms@mh day!")
         reloadPlugin()
     elseif cached_raw_version < cached_plugin_version then
         utilprint("Your development is too quick!")
