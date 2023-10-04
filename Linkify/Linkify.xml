@@ -11,7 +11,7 @@
    save_state="y"
    date_written="2023-09-25 00:00:00"
    requires="4.00"
-   version="1.54"
+   version="1.55"
    >
 </plugin>
 
@@ -111,8 +111,7 @@ function utilprint(string)
 end
 
 function OnPluginInstall()
-    PLUGIN_VERSION  = GetPluginInfo(GetPluginID(), 19)
-    PLUGIN_NAME   = GetPluginInfo(GetPluginID(), 1)
+    plugin_version  = GetPluginInfo(GetPluginID(), 19)
     firstInstall = GetVariable("firstInstall")
     if firstInstall == nil or firstInstall == "yes" then
         SendNoEcho("tags on")
@@ -138,19 +137,19 @@ function UpdateSelf()
 end
 
 function Raw_Update(retval, page, status, headers, full_status, request_url)
-    local raw_version
+    local repo_version
 
     if status == 200 then
-        raw_version = tonumber(string.match(page, '%s%s+version="(%d+%.?%d+)"'))
+        repo_version = tonumber(string.match(page, '%s%s+version="(%d+%.?%d+)"'))
     end
 
-    local cached_raw_version = tonumber(raw_version)
-    local cached_plugin_version = tonumber(PLUGIN_VERSION)
+    local cached_repo_version = tonumber(repo_version)
+    local cached_installed_version = tonumber(plugin_version)
 
-    if cached_raw_version == cached_plugin_version then
+    if cached_repo_version == cached_installed_version then
         utilprint("@x238[@RLi@x202n@x208k@x214i@x220f@x228y@x238] Already up to date!")
-    elseif cached_raw_version > cached_plugin_version then
-        utilprint("@x238[@RLi@x202n@x208k@x214i@x220f@x228y@x238] Updating from version @R" .. PLUGIN_VERSION .. "@x238 to @G" .. raw_version .. "@x238 Please stand by.")
+    elseif cached_repo_version > cached_installed_version then
+        utilprint("@x238[@RLi@x202n@x208k@x214i@x220f@x228y@x238] Updating from version @R" .. plugin_version .. "@x238 to @G" .. repo_version .. "@x238 Please stand by.")
 
         local file, err = io.open(GetPluginInfo(GetPluginID(), 6), "w")
         if file then
@@ -161,9 +160,9 @@ function Raw_Update(retval, page, status, headers, full_status, request_url)
             return
         end
 
-        utilprint("@x238[@RLi@x202n@x208k@x214i@x220f@x228y@x238] Updating is complete, Have a @Rm@Yu@Gd@Cd@Bi@Ms@mh day!")
+        utilprint("@x238[@RLi@x202n@x208k@x214i@x220f@x228y@x238] Updating is complete, have a @Rm@Yu@Gd@Cd@Bi@Ms@mh day!")
         reloadPlugin()
-    elseif cached_raw_version < cached_plugin_version then
+    elseif cached_repo_version < cached_installed_version then
         utilprint("Your development is too quick!")
     end
 end
