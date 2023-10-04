@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE muclient>
+
+<muclient>
+<plugin
+   name="Linkify"
+   author="Khadaji"
+   id="15bf0c926513966c26478db0"
+   language="Lua"
+   purpose="Accessibility plugin to linkify repetitive lists."
+   save_state="y"
+   date_written="2023-09-25 00:00:00"
+   requires="4.00"
+   version="1.5"
+   >
+</plugin>
+
+<aliases>
+<alias
+script="UpdateSelf"
+match="linkify update"
+enabled="y"
+regexp="y"
+sequence="100"
+>
+</alias>
+</aliases>
+<triggers>
+<trigger
+    name="ListStart"
+    enabled="y"
+    match="Num\s+Item Description\s+Lvl\s+Type Last Bid\s+Bids Time Left|Num  Level  Price    Qty  Item|{helpsearch}"
+    regexp="y"
+    omit_from_output="n"
+    sequence="100"
+    script="HandleListStart"
+>
+</trigger>
+
+<trigger
+    name="ListEnd"
+    enabled="y"
+    match="---------------------------------------------------------------------------------|Quantity '---' means unlimited supply\.|{\/helpsearch}"
+    regexp="y"
+    omit_from_output="n"
+    sequence="100"
+    send_to="12"
+>
+    <send>
+        EnableTrigger("MarketListCapture", false)
+    </send>
+</trigger>
+
+<trigger
+    name="MarketListCapture"
+    enabled="n"
+    match="^\s*(\d+|\w+)\s+(.+)$"
+    regexp="y"
+    omit_from_output="y"
+    sequence="100"
+    script="ItemListUpdate"
+>
+</trigger>
+</triggers>
+
+<script>
+<![CDATA[
+  dofile(GetInfo(60) .. "aardwolf_colors.lua")
+  currentAction = ""
+  FileRepo = "https://raw.githubusercontent.com/AsmodeusBrooding/Aardwolf-Updater/main/Linkify/Linkify.xml"
+
+  function HandleListStart(name, line)
+    EnableTrigger("MarketListCapture", true)
+    if string.find(line, "Num    Item Description") then
+        currentAction = "lbid"
+    elseif string.find(line, "Num  Level  Price") then
+        currentAction = "app"
+    elseif string.find(line, "{helpsearch}") then
+        currentAction = "help"
+    end
+end
+
+function ItemListUpdate(name, line, wildcards, styles)
+    local num = wildcards[1]                                    -- The item number
+    local action = string.format("%s %s", currentAction, num)   -- What happens when you click the item
+    local hint = string.format("Click to display item %s", num) -- What you see when you hover over the item
+
+    -- Loop through the styles to create the hyperlink
+    for _, v in pairs(styles) do
+        if v.text and v.textcolour then
+            if #(v.text) > 0 then  
+            local backcolour = v.backcolour or 0               -- Use a default if 'backcolour' is missing
+            Hyperlink(
+                action,
+                v.text,                                        -- Displayed text
+                hint,
+                RGBColourToName(v.textcolour),                 -- Foreground color
+                RGBColourToName(backcolour),                   -- Background color
+                0,
+                true
+            )
+        end
+        else
+            Note("One of the necessary fields (text, textcolour, backcolour) is missing in the styles table")
+        end
+    end
+end
+
+function utilprint(string)
+    AnsiNote(ColoursToANSI(string))
+end
+
+function OnPluginInstall()
+    PLUGIN_VERSION  = GetPluginInfo(GetPluginID(), 19)
+    PLUGIN_NAME   = GetPluginInfo(GetPluginID(), 1)
+    firstInstall = GetVariable("firstInstall")
+    if firstInstall == nil or firstInstall == "yes" then
+        SendNoEcho("tags on")
+        SendNoEcho("tags helps on")
+        utilprint("@x238[@RLi@x202n@x208k@x214i@x220f@x228y@x238]@Y First install, setting tags. This is a one time message.")
+        SetVariable("firstInstall", "no")
+    end
+end
+
+function UpdateSelf()
+    local FileRepo = "https://raw.githubusercontent.com/AsmodeusBrooding/ProceduralMUSH-Updater/main/PluginManager/ProceduralMUSH_Updater.xml"
+    local async_ok, async = pcall(require, "async")
+    if async_ok then
+        async.doAsyncRemoteRequest(FileRepo, Raw_Update, "HTTPS")
+    else
+        utilprint("Error on updating")
+    end
+end
+
+function Raw_Update(retval, page, status, headers, full_status, request_url)
+    local raw_version
+
+    if status == 200 then
+        raw_version = tonumber(string.match(page, '%s%s+version="(%d+%.?%d+)"'))
+    end
+
+    local cached_raw_version = tonumber(raw_version)
+    local cached_plugin_version = tonumber(PLUGIN_VERSION)
+
+    if cached_raw_version == cached_plugin_version then
+        utilprint("@Y" .. PLUGIN_NAME .. "@x238 is up to date!")
+    elseif cached_raw_version > cached_plugin_version then
+        utilprint("Updating from version @R" .. PLUGIN_VERSION .. "@x238 to @G" .. raw_version .. "@x238 Please stand by.")
+
+        local file, err = io.open(GetPluginInfo(GetPluginID(), 6), "w")
+        if file then
+            file:write(page)
+            file:close()
+        else
+            utilprint("File error: " .. err)
+            return
+        end
+
+        Execute("DoAfterSpecial(1, \"ReloadPlugin('" .. GetPluginID() .. "')\", sendto.script)")
+        utilprint("Updating is complete, Have a muddish day!")
+    elseif cached_raw_version < cached_plugin_version then
+        utilprint("Your development is too quick!")
+    end
+end
+
+]]>
+</script> 
+
+</muclient>
