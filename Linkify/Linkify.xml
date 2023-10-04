@@ -11,7 +11,7 @@
    save_state="y"
    date_written="2023-09-25 00:00:00"
    requires="4.00"
-   version="1.52"
+   version="1.54"
    >
 </plugin>
 
@@ -47,12 +47,12 @@ sequence="100"
     send_to="12"
 >
     <send>
-        EnableTrigger("MarketListCapture", false)
+        EnableTrigger("ListCapture", false)
     </send>
 </trigger>
 
 <trigger
-    name="MarketListCapture"
+    name="ListCapture"
     enabled="n"
     match="^\s*(\d+|\w+)\s+(.+)$"
     regexp="y"
@@ -70,7 +70,7 @@ sequence="100"
   FileRepo = "https://raw.githubusercontent.com/AsmodeusBrooding/Aardwolf-Updater/main/Linkify/Linkify.xml"
 
   function HandleListStart(name, line)
-    EnableTrigger("MarketListCapture", true)
+    EnableTrigger("ListCapture", true)
     if string.find(line, "Num    Item Description") then
         currentAction = "lbid"
     elseif string.find(line, "Num  Level  Price") then
