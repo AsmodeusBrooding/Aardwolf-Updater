@@ -160,7 +160,7 @@ function Raw_Update(retval, page, status, headers, full_status, request_url)
             return
         end
 
-        utilprint("@x238[@RLi@x202n@x208k@x214i@x220f@x228y@x238] Updating is complete, have a @Rm@Yu@Gd@Cd@Bi@Ms@mh day!")
+        utilprint("@x238[@RLi@x202n@x208k@x214i@x220f@x228y@x238] Updating is complete, have a @Rm@Yu@Gd@Cd@Bi@Ms@mh @x238day!")
         reloadPlugin()
     elseif cached_repo_version < cached_installed_version then
         utilprint("Your development is too quick!")
